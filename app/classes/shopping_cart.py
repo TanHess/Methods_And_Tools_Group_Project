@@ -20,7 +20,7 @@ class ShoppingCart():
         username_tuple = (self.user.username,)
         cur.execute(sql, username_tuple)
         isbns_quantity = cur.fetchall()     # Tuples holding isbns[0] and quantity[1]
-        for isbn_qty in isbns_quantity():   # For loop adds all the books in the Users db Cart to their client side cart
+        for isbn_qty in isbns_quantity:   # For loop adds all the books in the Users db Cart to their client side cart
             sql = 'SELECT * FROM Books WHERE ISBN=?'
             isbn_tuple = (isbn_qty[0],)     # For fetching all the book information from the Books table
             cur.execute(sql, isbn_tuple)
@@ -66,6 +66,9 @@ class ShoppingCart():
 
 
     def display_cart(self):
+        if len(self.items) == 0:
+            print("No items to display, your cart is empty!")
+            return
         for item in self.items:
             print('\n1)')
             print(item.__repr__())
@@ -152,6 +155,7 @@ class ShoppingCart():
 
 
     def checkout(self, db, verify=False) -> None:
+        self.get_cart(db)         # Re-gathers the local cart to ensure that there is no discontinuity between the client cart and the db cart
         self.refresh_price()   # Ensure self.total_cost is up to date. 
         cur = db.cursor()
         if verify==True:    # Only call when user wants to use pre-existing payment info
@@ -177,7 +181,7 @@ class ShoppingCart():
         max += 1            # New order_number to assign to all items going into the order table from this order.
         dt = date.today().strftime("%B %d, %Y")     # Current date (formatted) to put into the Orders table.
         for item in self.items:     # Next for loop adds each item to the orders table 
-            sql = 'INSERT INTO Orders(username, title, date, ISBN, quantity, order_number VALUES(?,?,?,?,?,?)'
+            sql = 'INSERT INTO Orders(username, title, date, ISBN, quantity, order_number) VALUES(?,?,?,?,?,?)'
             values = (self.user.username, item.title, dt, item.ISBN, item.quantity, max)    # All the values needed to insert into the Orders table
             cur.execute(sql, values)
             db.commit()

@@ -102,59 +102,17 @@ def find_many(conn, table_name: str, value_name, value) -> List[Tuple]:
         return False
 
 
-# SQL simplification of insert into Books table.
-def add_book(conn, values: Tuple[int, str, str, str, str, float, int]) -> int:
-
-    sql = ''' INSERT INTO Books(ISBN,title,author,genre,format,price,quantity)
-            VALUES(?,?,?,?,?,?,?) '''
-    try:
-        cur = conn.cursor()
-        cur.execute(sql, values)
-        conn.commit()
-        return cur.lastrowid
-    except:
-        print('Unkown error occured.')
-        return False
-
-
-# SQL simplification of insert into Users.
-def add_user(conn, values: Tuple[str, str, str, str, str, str, str, int, int, int]) -> int:
-    
-    sql = ''' INSERT INTO Users(username,first_name,last_name,password,address,state,city,zip,cc_number,cc_cvv)
-            VALUES(?,?,?,?,?,?,?,?,?,?) '''
-    try:
-        cur = conn.cursor()
-        cur.execute(sql, values)
-        conn.commit()
-        return cur.lastrowid
-    except:
-        print('Unkown error occured.')
-        return False
-
-# SQL simplification of insert into Orders table.
-def add_order(conn, values: Tuple[str, str, str, str, str, int]) -> int:
-    sql = ''' INSERT INTO Orders(username,title,date,ISBN,quantity,order_number)
-            VALUES(?,?,?,?,?,?) '''
-    try:
-        cur = conn.cursor()
-        cur.execute(sql, values)
-        conn.commit()
-        return cur.lastrowid
-    except:
-        print('Unkown error occured.')
-        return False
-
-
-#SQL simplification of insert into Cart table.
-def add_to_cart(conn, values: Tuple[int, str, int]) -> int:
-        sql = ''' INSERT INTO Cart(ISBN,username,quantity)
-            VALUES(?,?,?) '''
-        try:
-            cur = conn.cursor()
-            cur.execute(sql, values)
+# Function to clear every entry in every table of the database. 
+# Really just so we can reset/repopulate db for testing/demonstrating app functionality.
+def clear_all_db(conn):
+    tables = ['Users', 'Orders', 'Books', 'Cart']
+    for table_name in tables:
+            sql = 'DELETE FROM ' + table_name
+            conn.execute(sql)
             conn.commit()
-            return cur.lastrowid
-        except:
-            print('Unkown error occured.')
-            return False
 
+
+# Function to populate the inventory full of pre-defined book items.
+# Similar to above function, should be used to test/demonstrate app with ease.
+def populate_inventory(conn):
+    pass

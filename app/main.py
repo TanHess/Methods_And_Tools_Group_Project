@@ -1,26 +1,10 @@
-from database_manager import create_connection, TABLES, init_database, DB_NAME, add_to_cart
+from database_manager import create_connection, TABLES, init_database, DB_NAME, clear_all_db
 from classes.book import Book
 from classes.user import User
 
 def main():
     db = create_connection(DB_NAME)
-    add_to_cart(db, (1234, 'tannermhess', 1))
-    cur = db.cursor()
-    values = (1234,)
-    sql = 'SELECT quantity FROM Cart WHERE ISBN=?'
-    cur.execute(sql,values)
-    value=cur.fetchone()[0]
-    print(value)
-    cur.execute("SELECT * FROM Cart")
-    values = cur.fetchall()
-    for val in values:
-        print(val)
-        
-    cur.execute("DELETE FROM Cart")
-    cur.execute("DELETE FROM Books")
-    db.commit()
-
-
+    clear_all_db(db)
 
 
 # Tests for the shopping cart class (to be deleted)
@@ -100,10 +84,17 @@ def test():
         print(row)
     user.cart.display_cart()
 
-
+    user.cart.add(book, 8, db)
+    user.cart.remove(0,5,db)
+    user.cart.display_cart()
     user.cart.checkout(db)
     user.cart.display_cart()
-
+    sql = 'SELECT * FROM Orders WHERE username=?'
+    values = (user.username,)
+    cur.execute(sql, values)
+    rows = cur.fetchall()
+    for row in rows:
+        print(row)
 if __name__=="__main__":
     main()
     test()
