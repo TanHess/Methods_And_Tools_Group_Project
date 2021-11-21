@@ -22,6 +22,8 @@ def main():
 
 
 
+
+# Tests for the shopping cart class (to be deleted)
 def test():
     print('\n\n')
     db = create_connection(DB_NAME)
@@ -76,6 +78,19 @@ def test():
     user.cart.display_cart()
 
     worked = user.cart.remove(0, 15, db)
+    sql = 'SELECT * FROM Cart WHERE username=?'
+    print(str(worked))
+    values = (user.username,)
+    cur.execute(sql, values)
+    rows = cur.fetchall()
+    for row in rows:
+        print(row)
+    user.cart.display_cart()
+
+
+    worked = user.cart.add(book, 4, db)
+    print(str(worked))
+    worked = user.cart.empty(db)
     sql = 'SELECT * FROM Cart WHERE username=?'
     print(str(worked))
     values = (user.username,)

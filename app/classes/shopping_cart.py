@@ -14,6 +14,7 @@ class ShoppingCart():
     # Use this to initialize cart instead of __init__ 
     # This way, anonomous users can still have a cart object.
     def get_cart(self, db):
+        self.items.clear()      # Empty the clientside cart to avoid calling this function multiple times and flooding the cart.
         cur = db.cursor()
         sql = 'SELECT ISBN, quantity FROM Cart WHERE username=?'
         username_tuple = (self.user.username,)
@@ -70,9 +71,11 @@ class ShoppingCart():
             print(item.__repr__())
 
 
+    # Remove a book from the client and the database 
     def remove(self, index, quantity, db) -> bool:
         if index > len(self.items) - 1:   # Protect against out of index
             print("Error! Only valid options please!!")
+            return False
         if self.items[index].quantity - quantity < 0:   # Protect against removing more books than exist
             quantity = self.items[index].quantity
         self.items[index].quantity -= quantity
@@ -174,6 +177,16 @@ class ShoppingCart():
         for item in self.items:     # Next for loop adds each item to the orders table 
             sql = 'INSERT INTO Orders(username, title, date, ISBN, quantity, order_number VALUES(?,?,?,?,?,?)'
             values = (self.user.username, item.title, dt, item.ISBN, item.quantity, max)    # All the values needed to insert into the Orders table
+            cur.execute(sql, values)
+            db.commit()
+
+            sql = 'SELECT quantity FROM Books WHERE ISBN=?'     # Get the old quantity in the Books table
+            values = (item.ISBN,)
+            cur.execute(sql, values)
+            old_qty = cur.fetchone()[0]   # Old book quantity in inventory 
+            new_qty = old_qty - item.quantity    # New qyantity to SET in the Books Table
+            sql = 'UPDATE Books SET quantity=? WHERE ISBN=?'   # Update the Books table quantity of each of the books in the cart.
+            values = (new_qty, item.ISBN)
             cur.execute(sql, values)
             db.commit()
         self.empty() # Finally, empty the user's cart.
