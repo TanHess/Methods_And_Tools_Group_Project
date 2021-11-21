@@ -101,6 +101,9 @@ def test():
     user.cart.display_cart()
 
 
+    user.cart.checkout(db)
+    user.cart.display_cart()
+
 if __name__=="__main__":
     main()
     test()

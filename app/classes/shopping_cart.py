@@ -172,6 +172,8 @@ class ShoppingCart():
         username_tuple = (self.user.username,)
         cur.execute(sql,username_tuple)
         max = cur.fetchone()[0]
+        if max == None:     # Protect against an error where no orders exist for the current user in the orders table.
+            max = 0         
         max += 1            # New order_number to assign to all items going into the order table from this order.
         dt = date.today().strftime("%B %d, %Y")     # Current date (formatted) to put into the Orders table.
         for item in self.items:     # Next for loop adds each item to the orders table 
@@ -189,7 +191,7 @@ class ShoppingCart():
             values = (new_qty, item.ISBN)
             cur.execute(sql, values)
             db.commit()
-        self.empty() # Finally, empty the user's cart.
+        self.empty(db) # Finally, empty the user's cart.
 
 
 
