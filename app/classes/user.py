@@ -1,5 +1,5 @@
 # Connor
-from shopping_cart import ShoppingCart
+from classes.shopping_cart import ShoppingCart
 
 
 class User():
@@ -36,6 +36,6 @@ class User():
 
     def delete_account(self):
         pass
-    
+
 
 
