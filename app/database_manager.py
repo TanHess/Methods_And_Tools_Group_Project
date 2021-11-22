@@ -1,6 +1,7 @@
 import sqlite3 as db
 from typing import Callable, List, Tuple 
 
+#===================================================================================================
 # GLOBALS:
 DB_NAME = "store.db"
 USERS_TABLE = """CREATE TABLE IF NOT EXISTS Users (
@@ -49,10 +50,13 @@ BOOKS_TABLE = """CREATE TABLE IF NOT EXISTS Books (
                                     quantity INTEGER NOT NULL
                                 );"""
 
-
-
 TABLES = [USERS_TABLE, BOOKS_TABLE, ORDERS_TABLE, CART_TABLE]
 
+DEFAULT_BOOKS = []      # To be filled later with default book objects (for the reset_to_default function)
+
+
+#===================================================================================================
+# FUNCTIONS:
 def create_connection(db_file):
     """ create a database connection to the SQLite database
         specified by db_file
@@ -114,5 +118,16 @@ def clear_all_db(conn):
 
 # Function to populate the inventory full of pre-defined book items.
 # Similar to above function, should be used to test/demonstrate app with ease.
-def populate_inventory(conn):
-    pass
+def populate_inventory(conn, books_to_add):
+    for book in books_to_add:
+        book.add_to_db()
+
+
+
+# Function to completely reset the database to its default value. 
+def reset_to_default(conn):
+    clear_all_db(conn)
+    init_database(conn, TABLES)
+    books = []
+    populate_inventory(conn, books)     # Populate db with books in the above list. 
+
