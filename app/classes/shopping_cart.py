@@ -1,6 +1,6 @@
 # Tanner
 from datetime import date
-from classes.book import Book
+from .book import Book
 from copy import deepcopy
 
 class ShoppingCart():
@@ -21,7 +21,7 @@ class ShoppingCart():
         cur.execute(sql, username_tuple)
         isbns_quantity = cur.fetchall()     # Tuples holding isbns[0] and quantity[1]
         for isbn_qty in isbns_quantity:   # For loop adds all the books in the Users db Cart to their client side cart
-            sql = 'SELECT * FROM BOOK WHERE ISBN=?'
+            sql = 'SELECT * FROM BOOKS WHERE ISBN=?'
             isbn_tuple = (isbn_qty[0],)     # For fetching all the book information from the Books table
             cur.execute(sql, isbn_tuple)
             book = cur.fetchone()

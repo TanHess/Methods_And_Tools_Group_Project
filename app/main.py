@@ -9,8 +9,13 @@ def main():
 
 # Tests for the shopping cart class (to be deleted)
 def test():
-    print('\n\n')
     db = create_connection(DB_NAME)
+    user1 = User()
+    user1.create_account(db)
+
+
+
+    print('\n\n')
     book = Book()
     book.ISBN = 12345
     book.title = 'The Lion, The Which, And The Wardrobe'
@@ -39,7 +44,7 @@ def test():
     rows = cur.fetchall()
     for row in rows:
         print(row)
-    user.cart.display_cart()
+    user.view_cart()
 
     worked = user.cart.add(book, 4, db)
     sql = 'SELECT * FROM Cart WHERE username=?'
@@ -49,7 +54,7 @@ def test():
     rows = cur.fetchall()
     for row in rows:
         print(row)
-    user.cart.display_cart()
+    user.view_cart()
 
     worked = user.cart.remove(0, 2, db)
     sql = 'SELECT * FROM Cart WHERE username=?'
@@ -59,7 +64,7 @@ def test():
     rows = cur.fetchall()
     for row in rows:
         print(row)
-    user.cart.display_cart()
+    user.view_cart()
 
     worked = user.cart.remove(0, 15, db)
     sql = 'SELECT * FROM Cart WHERE username=?'
@@ -69,7 +74,7 @@ def test():
     rows = cur.fetchall()
     for row in rows:
         print(row)
-    user.cart.display_cart()
+    user.view_cart()
 
 
     worked = user.cart.add(book, 4, db)
