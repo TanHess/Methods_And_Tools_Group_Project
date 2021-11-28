@@ -13,9 +13,9 @@ USERS_TABLE = """CREATE TABLE IF NOT EXISTS Users (
                                         address TEXT NOT NULL,
                                         state TEXT NOT NULL,
                                         city TEXT NOT NULL,
-                                        zip int NOT NULL,
-                                        cc_number int NOT NULL,
-                                        cc_cvv int NOT NULL
+                                        zip INTEGER NOT NULL,
+                                        cc_number INTEGER NOT NULL,
+                                        cc_cvv INTEGER NOT NULL
                                     );"""
 
 ORDERS_TABLE = """CREATE TABLE IF NOT EXISTS Orders (
@@ -24,7 +24,7 @@ ORDERS_TABLE = """CREATE TABLE IF NOT EXISTS Orders (
                                     title TEXT NOT NULL,
                                     date TEXT NOT NULL,
                                     ISBN TEXT NOT NULL,
-                                    quantity TEXT NOT NULL,
+                                    quantity INTEGER NOT NULL,
                                     order_number INTEGER NOT NULL,
                                     FOREIGN KEY (username) REFERENCES Users (username),
                                     FOREIGN KEY (ISBN) REFERENCES Books (ISBN)
@@ -51,6 +51,7 @@ BOOKS_TABLE = """CREATE TABLE IF NOT EXISTS Books (
                                 );"""
 
 TABLES = [USERS_TABLE, BOOKS_TABLE, ORDERS_TABLE, CART_TABLE]
+DELETE_TABLES = ['DROP TABLE IF EXISTS Books', 'DROP TABLE IF EXISTS Users', 'DROP TABlE IF EXISTS Books', 'DROP TABLE IF EXISTS Orders']
 
 DEFAULT_BOOKS = []      # To be filled later with default book objects (for the reset_to_default function)
 
@@ -72,6 +73,26 @@ def create_connection(db_file):
     return conn
 
 
+
+
+def delete_table(conn, sql):
+    ''' Inverse of the create_table function
+    Deletes the table based on the sql inputted.
+    '''
+    try:
+        c = conn.cursor()
+        c.execute(sql)
+    except db.Error as e:
+        print(e)
+
+
+
+def drop_all(conn, tables):
+    for table in tables:
+        delete_table(conn, table)
+
+
+
 def create_table(conn, table_command):
     """ create a table from the create_table_sql statement
     :param conn: Connection object
@@ -85,9 +106,9 @@ def create_table(conn, table_command):
         print(e)
 
 
-def init_database(conn, *args):
-    for arg in args:
-        create_table(conn, arg)
+def init_database(conn, tables):
+    for table in tables:
+        create_table(conn, table)
 
 
 
@@ -130,4 +151,10 @@ def reset_to_default(conn):
     init_database(conn, TABLES)
     books = []
     populate_inventory(conn, books)     # Populate db with books in the above list. 
+
+
+def remake_db(conn):
+    drop_all(conn, DELETE_TABLES)
+    init_database(conn, TABLES)
+
 
