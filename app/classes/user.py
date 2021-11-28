@@ -39,7 +39,6 @@ class User():
         sql = 'SELECT username FROM Users WHERE username=?'
         cur.execute(sql, (username,))
         account = cur.fetchone()
-        print(account)
         if account == None:
             return True
         else: 
@@ -74,7 +73,7 @@ class User():
 
         cur = db.cursor()
         sql = ''' INSERT INTO Users(first_name, last_name, username, password_salt, password_key, address, city, state, zip, cc_number, cc_cvv)
-            VALUES(?,?,?) '''
+            VALUES(?,?,?,?,?,?,?,?,?,?,?) '''
         values = (self.first_name, self.last_name, self.username, self.pwd_info.get("salt"), self.pwd_info.get("key"), self.address, self.city, self.state, self.zip, self.payment_info.get("cc"), self.payment_info.get("cc_cvv"))
         cur.execute(sql, values)
         db.commit()
@@ -122,6 +121,17 @@ class User():
             return
 
     def logout(self):
+        self.first_name = ''
+        self.last_name = ''
+        self.username = ''
+        self.address = ''
+        self.city = ''
+        self.state = ''
+        self.zip = 0
+        self.cart = ShoppingCart(self)
         self.logged_in = False
+        self.payment_info = {"cc": 0, "cc_cvv": 0}
+        self.pwd_info = {"salt": 0, "key": 0}
+
 
 
