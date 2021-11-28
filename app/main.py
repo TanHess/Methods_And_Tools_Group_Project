@@ -1,10 +1,12 @@
-from database_manager import create_connection, TABLES, init_database, DB_NAME, clear_all_db
+from database_manager import create_connection, TABLES, init_database, DB_NAME, clear_all_db, remake_db
 from classes.book import Book
 from classes.user import User
 
 def main():
     db = create_connection(DB_NAME)
-    clear_all_db(db)
+    #clear_all_db(db)
+    remake_db(db)
+    #init_database(db, TABLES)
 
 
 # Tests for the shopping cart class (to be deleted)

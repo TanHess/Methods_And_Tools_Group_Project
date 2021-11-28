@@ -71,7 +71,7 @@ class ShoppingCart():
             return
         for item in self.items:
             print('\n1)')
-            print(item.__repr__())
+            print(item.__repr__() + '\n')
 
 
     # Remove a book from the client and the database 
