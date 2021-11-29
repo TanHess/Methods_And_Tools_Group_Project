@@ -5,9 +5,8 @@ from classes.inventory import Inventory
 
 def main():
     db = create_connection(DB_NAME)
-    """  Inv = Inventory(db)
-    gotbook = Inv.retrieveBook(12345)
-    print(gotbook) """
+    Inv = Inventory(db)
+    Inv.displayBygenre('fiction')
     clear_all_db(db)
 
 
@@ -100,7 +99,7 @@ def test():
     for row in rows:
         print(row)
 if __name__=="__main__":
-    test()
+    #test()
     main()
    
     

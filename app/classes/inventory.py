@@ -15,6 +15,13 @@ class Inventory():
         books = self.inv_cur().execute("SELECT title,stock,price,format FROM Book")
         #prints the table for the user to peruse the available inventory
         print(tabulate(books.fetchall(),headers=["TITLE",'STOCK','PRICE','FORMAT']))
+
+    def displayBygenre(self,genre):
+        query = "SELECT * FROM Books WHERE genre ='"+genre+"'"
+        print(query)
+        execution =self.inv_cur().execute(query)
+        print(tabulate(execution.fetchall(),headers=["TITLE",'STOCK','PRICE','FORMAT']))
+
     def retrieveBook(self,ISBN):
         query = "SELECT title,price,author,genre,format,quantity FROM Books WHERE ISBN ="+str(ISBN)
         result = self.inv_cur().execute(query)
