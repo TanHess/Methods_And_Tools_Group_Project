@@ -26,9 +26,25 @@ class Book():
         return visual
 
 
-    def remove_from_db():
-        pass
+    def remove_from_db(self, db, ISBN):
+        cur = db.cursor()
+        sql = 'DELETE FROM Books WHERE ISBN=?'
+        cur.execute(sql, (self.ISBN,))
+        db.commit()
 
 
-    def add_to_db():
-        pass
+    def add_to_db(self, quantity, ISBN, title, author, genre, bookFormat, db):
+        self.quantity = quantity
+        self.ISBN = ISBN
+        self.title = title
+        self.price = price
+        self.author = author
+        self.genre = genre
+        self.format = bookFormat
+        
+        cur = db.cursor()
+        sql = ''' INSERT INTO Books(quantity, ISBN, title, author, genre, bookFormat)
+            VALUES(?,?,?,?,?,?) '''
+        values = (self.quantity, self.ISBN, self.title, self.price, self.author, self.genre, self.format)
+        cur.execute(sql, values)
+        db.commit()
