@@ -9,7 +9,8 @@ USERS_TABLE = """CREATE TABLE IF NOT EXISTS Users (
                                         username TEXT NOT NULL UNIQUE,
                                         first_name TEXT NOT NULL,
                                         last_name TEXT NOT NULL,
-                                        password TEXT NOT NULL,
+                                        password_salt TEXT NOT NULL,
+                                        password_key TEXT NOT NULL,
                                         address TEXT NOT NULL,
                                         state TEXT NOT NULL,
                                         city TEXT NOT NULL,
@@ -45,7 +46,7 @@ BOOKS_TABLE = """CREATE TABLE IF NOT EXISTS Books (
                                     title TEXT NOT NULL,
                                     author TEXT NOT NULL,
                                     genre TEXT NOT NULL,
-                                    format TEXT NOT NULL,
+                                    bookFormat TEXT NOT NULL,
                                     price REAL NOT NULL,
                                     quantity INTEGER NOT NULL
                                 );"""

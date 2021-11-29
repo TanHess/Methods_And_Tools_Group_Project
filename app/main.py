@@ -33,7 +33,6 @@ def menuing():
 
 # Tests for the shopping cart class (to be deleted)
 def test():
-    print('\n\n')
     db = create_connection(DB_NAME)
     user1 = User()
     user1.create_account(db)

@@ -30,5 +30,13 @@ class Book():
         pass
 
 
-    def add_to_db():
-        pass
+    def add_to_db(self, db):
+        sql = 'INSERT INTO Books(quantity, ISBN, title, author, genre, bookFormat)'
+        values = (self.quantity, self.ISBN, self.title, self.author, self.genre, self.format)
+        sql = 'SET '
+
+        # Add to db just adds the current book object to db
+
+        # The other thing add book should do is check if the
+        # book already exists in the database, and if so, 
+        # just update the quantity

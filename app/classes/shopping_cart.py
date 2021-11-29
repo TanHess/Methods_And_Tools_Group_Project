@@ -1,6 +1,6 @@
 # Tanner
 from datetime import date
-from classes.book import Book
+from .book import Book
 from copy import deepcopy
 
 class ShoppingCart():
@@ -16,12 +16,12 @@ class ShoppingCart():
     def get_cart(self, db):
         self.items.clear()      # Empty the clientside cart to avoid calling this function multiple times and flooding the cart.
         cur = db.cursor()
-        sql = 'SELECT ISBN, quantity FROM Cart WHERE username=?'
+        sql = 'SELECT ISBN, quantity FROM CART WHERE username=?'
         username_tuple = (self.user.username,)
         cur.execute(sql, username_tuple)
         isbns_quantity = cur.fetchall()     # Tuples holding isbns[0] and quantity[1]
         for isbn_qty in isbns_quantity:   # For loop adds all the books in the Users db Cart to their client side cart
-            sql = 'SELECT * FROM Books WHERE ISBN=?'
+            sql = 'SELECT * FROM BOOKS WHERE ISBN=?'
             isbn_tuple = (isbn_qty[0],)     # For fetching all the book information from the Books table
             cur.execute(sql, isbn_tuple)
             book = cur.fetchone()
@@ -50,13 +50,13 @@ class ShoppingCart():
     # In the real world, much more verification would take place but this is fake payment info anyways.
     def verify_payment_info(self, db) -> bool:
         cur = db.cursor()
-        sql = 'SELECT cc FROM Users WHERE username=?'
+        sql = 'SELECT cc FROM USERS WHERE username=?'
         user_tuple=(self.user.username,)
         cur.execute(sql,user_tuple)
         cc = int(cur.fetchone()[0])
         if self.user.payment_info.get('cc') != cc:
             return False            # Unverified cc info
-        sql = 'SELECT cc_cvv FROM Users WHERE username=?'
+        sql = 'SELECT cc_cvv FROM USERS WHERE username=?'
         cur.execute(sql,user_tuple)
         cc_cvv = int(cur.fetchone()[0])
         if self.user.payment_info.get('cc_cvv') != cc_cvv:
@@ -86,13 +86,13 @@ class ShoppingCart():
         try:
             if self.items[index].quantity == 0:
                 removed_book = self.items.pop(index)
-                sql = 'DELETE FROM Cart WHERE ISBN=? AND username=?'
+                sql = 'DELETE FROM CART WHERE ISBN=? AND username=?'
                 cur.execute(sql, (removed_book.ISBN, self.user.username))
                 db.commit()
                 self.refresh_price()
                 return True
             elif self.items[index].quantity > 0:
-                sql = 'UPDATE Cart SET quantity=? WHERE ISBN=? AND username=?'
+                sql = 'UPDATE CART SET quantity=? WHERE ISBN=? AND username=?'
                 values = (self.items[index].quantity, self.items[index].ISBN, self.user.username)
                 cur.execute(sql, values)
                 db.commit()
@@ -108,7 +108,7 @@ class ShoppingCart():
         book_to_add = deepcopy(book)    # Prevent changing the original objects quantity by creating a new book object
         book_to_add.quantity = quantity
         cur = db.cursor()
-        sql = 'SELECT quantity FROM Books WHERE ISBN=?'
+        sql = 'SELECT quantity FROM BOOKS WHERE ISBN=?'
         values = (book_to_add.ISBN,)
         cur.execute(sql, values)
         qty_in_db = cur.fetchone()[0]
@@ -124,7 +124,7 @@ class ShoppingCart():
                     self.refresh_price()
                     return False
                 item.quantity += quantity   # If we didn't return yet, then the user is adding more of this item to their cart
-                sql = 'UPDATE Cart SET quantity=? WHERE ISBN=? AND USERNAME=?'
+                sql = 'UPDATE CART SET quantity=? WHERE ISBN=? AND USERNAME=?'
                 new_values = (item.quantity, item.ISBN, self.user.username)
                 cur.execute(sql, new_values)
                 db.commit()
@@ -133,7 +133,7 @@ class ShoppingCart():
         
         # If no item exists in the cart table and cart list, add it.
         self.items.append(book_to_add)
-        sql = ''' INSERT INTO Cart(ISBN,username,quantity)
+        sql = ''' INSERT INTO CART(ISBN,username,quantity)
             VALUES(?,?,?) '''
         new_values = (book_to_add.ISBN, self.user.username, book_to_add.quantity)
         cur.execute(sql, new_values)
@@ -146,7 +146,7 @@ class ShoppingCart():
     #  Completely empty the cart list/table (where entries are under the current user's username)
     def empty(self, db) -> None:
         cur = db.cursor()
-        sql = 'DELETE FROM Cart WHERE username=?'
+        sql = 'DELETE FROM CART WHERE username=?'
         cur.execute(sql, (self.user.username,))
         db.commit()
         self.items.clear()
@@ -163,7 +163,7 @@ class ShoppingCart():
                 print("Error, payment info invalid.")   
                 return False
         for item in self.items:     # First for loop checks all items have enough stock to checkout.
-            sql = 'SELECT quantity FROM Books WHERE ISBN=?'
+            sql = 'SELECT quantity FROM BOOKS WHERE ISBN=?'
             values = (item.ISBN,)
             cur.execute(sql, values)
             qty = cur.fetchone()[0]
@@ -172,7 +172,7 @@ class ShoppingCart():
                 return False
         
         # Find the max order_number associated with the current users names and increments it by 1 (new order number)
-        sql = 'SELECT MAX(order_number) FROM Orders WHERE username=?'
+        sql = 'SELECT MAX(order_number) FROM ORDERS WHERE username=?'
         username_tuple = (self.user.username,)
         cur.execute(sql,username_tuple)
         max = cur.fetchone()[0]
@@ -181,17 +181,17 @@ class ShoppingCart():
         max += 1            # New order_number to assign to all items going into the order table from this order.
         dt = date.today().strftime("%B %d, %Y")     # Current date (formatted) to put into the Orders table.
         for item in self.items:     # Next for loop adds each item to the orders table 
-            sql = 'INSERT INTO Orders(username, title, date, ISBN, quantity, order_number) VALUES(?,?,?,?,?,?)'
+            sql = 'INSERT INTO ORDERS(username, title, date, ISBN, quantity, order_number) VALUES(?,?,?,?,?,?)'
             values = (self.user.username, item.title, dt, item.ISBN, item.quantity, max)    # All the values needed to insert into the Orders table
             cur.execute(sql, values)
             db.commit()
 
-            sql = 'SELECT quantity FROM Books WHERE ISBN=?'     # Get the old quantity in the Books table
+            sql = 'SELECT quantity FROM BOOKS WHERE ISBN=?'     # Get the old quantity in the Books table
             values = (item.ISBN,)
             cur.execute(sql, values)
             old_qty = cur.fetchone()[0]   # Old book quantity in inventory 
             new_qty = old_qty - item.quantity    # New qyantity to SET in the Books Table
-            sql = 'UPDATE Books SET quantity=? WHERE ISBN=?'   # Update the Books table quantity of each of the books in the cart.
+            sql = 'UPDATE BOOKS SET quantity=? WHERE ISBN=?'   # Update the Books table quantity of each of the books in the cart.
             values = (new_qty, item.ISBN)
             cur.execute(sql, values)
             db.commit()
