@@ -9,6 +9,22 @@ def main():
     #init_database(db, TABLES)
 
 
+def menuing():
+    run = True
+    current_user = User()
+    while run == True:
+        print("====================Main Menu====================")
+        # If the user is logged in: menu
+        if current_user.logged_in:
+            pass
+        # If the user is not logged in: menu
+        else:
+            choice = -1
+            while choice not in [1, 2, 3]:
+                choice = input("1) Login\n2) Logout\n3) Exit Program \nEnter your choice: ")
+
+
+
 # Tests for the shopping cart class (to be deleted)
 def test():
     db = create_connection(DB_NAME)
