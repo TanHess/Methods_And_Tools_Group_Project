@@ -138,6 +138,7 @@ class User():
             self.payment_info = {"cc": account[6], "cc_cvv": account[7]}
             self.pwd_info = {"salt": salt, "key": key}
             self.initialize_cart()
+
             print("Successfully logged in!")
             return True
         else:
