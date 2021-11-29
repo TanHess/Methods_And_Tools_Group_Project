@@ -46,7 +46,7 @@ BOOKS_TABLE = """CREATE TABLE IF NOT EXISTS Books (
                                     title TEXT NOT NULL,
                                     author TEXT NOT NULL,
                                     genre TEXT NOT NULL,
-                                    bookFormat TEXT NOT NULL,
+                                    format TEXT NOT NULL,
                                     price REAL NOT NULL,
                                     quantity INTEGER NOT NULL
                                 );"""

@@ -4,23 +4,26 @@ from .book import Book
 from copy import deepcopy
 
 class ShoppingCart():
-    def __init__(self, user):
+    def __init__(self, user, db = None):
         self.user = user
         self.number_of_items = 0
         self.items = []
         self.total_cost = 0
+        self.db = db
 
     
     # Use this to initialize cart instead of __init__ 
     # This way, anonomous users can still have a cart object.
-    def get_cart(self, db):
+    def get_cart(self):
         self.items.clear()      # Empty the clientside cart to avoid calling this function multiple times and flooding the cart.
-        cur = db.cursor()
+        cur = self.db.cursor()
         sql = 'SELECT ISBN, quantity FROM CART WHERE username=?'
         username_tuple = (self.user.username,)
         cur.execute(sql, username_tuple)
         isbns_quantity = cur.fetchall()     # Tuples holding isbns[0] and quantity[1]
-        for isbn_qty in isbns_quantity:   # For loop adds all the books in the Users db Cart to their client side cart
+        if isbns_quantity == None:
+            return
+        for isbn_qty in isbns_quantity:   # For loop adds all the books in the Users self.db Cart to their client side cart
             sql = 'SELECT * FROM BOOKS WHERE ISBN=?'
             isbn_tuple = (isbn_qty[0],)     # For fetching all the book information from the Books table
             cur.execute(sql, isbn_tuple)
@@ -48,8 +51,8 @@ class ShoppingCart():
 
 
     # In the real world, much more verification would take place but this is fake payment info anyways.
-    def verify_payment_info(self, db) -> bool:
-        cur = db.cursor()
+    def verify_payment_info(self) -> bool:
+        cur = self.db.cursor()
         sql = 'SELECT cc FROM USERS WHERE username=?'
         user_tuple=(self.user.username,)
         cur.execute(sql,user_tuple)
@@ -75,27 +78,27 @@ class ShoppingCart():
 
 
     # Remove a book from the client and the database 
-    def remove(self, index, quantity, db) -> bool:
+    def remove(self, index, quantity) -> bool:
         if index > len(self.items) - 1:   # Protect against out of index
             print("Error! Only valid options please!!")
             return False
         if self.items[index].quantity - quantity < 0:   # Protect against removing more books than exist
             quantity = self.items[index].quantity
         self.items[index].quantity -= quantity
-        cur = db.cursor()
+        cur = self.db.cursor()
         try:
             if self.items[index].quantity == 0:
                 removed_book = self.items.pop(index)
                 sql = 'DELETE FROM CART WHERE ISBN=? AND username=?'
                 cur.execute(sql, (removed_book.ISBN, self.user.username))
-                db.commit()
+                self.db.commit()
                 self.refresh_price()
                 return True
             elif self.items[index].quantity > 0:
                 sql = 'UPDATE CART SET quantity=? WHERE ISBN=? AND username=?'
                 values = (self.items[index].quantity, self.items[index].ISBN, self.user.username)
                 cur.execute(sql, values)
-                db.commit()
+                self.db.commit()
                 self.refresh_price()
                 return True
         except:
@@ -103,11 +106,11 @@ class ShoppingCart():
             return False
 
 
-    def add(self, book, quantity, db) -> bool:
+    def add(self, book, quantity) -> bool:
         # First, ensure that there are enough books in stock to supply the cart.
         book_to_add = deepcopy(book)    # Prevent changing the original objects quantity by creating a new book object
         book_to_add.quantity = quantity
-        cur = db.cursor()
+        cur = self.db.cursor()
         sql = 'SELECT quantity FROM BOOKS WHERE ISBN=?'
         values = (book_to_add.ISBN,)
         cur.execute(sql, values)
@@ -127,7 +130,7 @@ class ShoppingCart():
                 sql = 'UPDATE CART SET quantity=? WHERE ISBN=? AND USERNAME=?'
                 new_values = (item.quantity, item.ISBN, self.user.username)
                 cur.execute(sql, new_values)
-                db.commit()
+                self.db.commit()
                 self.refresh_price()
                 return True
         
@@ -137,27 +140,27 @@ class ShoppingCart():
             VALUES(?,?,?) '''
         new_values = (book_to_add.ISBN, self.user.username, book_to_add.quantity)
         cur.execute(sql, new_values)
-        db.commit()
+        self.db.commit()
         self.refresh_price()
         return True
         
 
 
     #  Completely empty the cart list/table (where entries are under the current user's username)
-    def empty(self, db) -> None:
-        cur = db.cursor()
+    def empty(self) -> None:
+        cur = self.db.cursor()
         sql = 'DELETE FROM CART WHERE username=?'
         cur.execute(sql, (self.user.username,))
-        db.commit()
+        self.db.commit()
         self.items.clear()
 
 
 
 
-    def checkout(self, db, verify=False) -> None:
-        self.get_cart(db)         # Re-gathers the local cart to ensure that there is no discontinuity between the client cart and the db cart
+    def checkout(self, verify=False) -> None:
+        self.get_cart()         # Re-gathers the local cart to ensure that there is no discontinuity between the client cart and the self.db cart
         self.refresh_price()   # Ensure self.total_cost is up to date. 
-        cur = db.cursor()
+        cur = self.db.cursor()
         if verify==True:    # Only call when user wants to use pre-existing payment info
             if self.verify_payment_info() == False:     # Ensure User payment info is valid.
                 print("Error, payment info invalid.")   
@@ -184,7 +187,7 @@ class ShoppingCart():
             sql = 'INSERT INTO ORDERS(username, title, date, ISBN, quantity, order_number) VALUES(?,?,?,?,?,?)'
             values = (self.user.username, item.title, dt, item.ISBN, item.quantity, max)    # All the values needed to insert into the Orders table
             cur.execute(sql, values)
-            db.commit()
+            self.db.commit()
 
             sql = 'SELECT quantity FROM BOOKS WHERE ISBN=?'     # Get the old quantity in the Books table
             values = (item.ISBN,)
@@ -194,8 +197,8 @@ class ShoppingCart():
             sql = 'UPDATE BOOKS SET quantity=? WHERE ISBN=?'   # Update the Books table quantity of each of the books in the cart.
             values = (new_qty, item.ISBN)
             cur.execute(sql, values)
-            db.commit()
-        self.empty(db) # Finally, empty the user's cart.
+            self.db.commit()
+        self.empty() # Finally, empty the user's cart.
 
 
 

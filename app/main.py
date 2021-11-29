@@ -34,8 +34,12 @@ def menuing():
 # Tests for the shopping cart class (to be deleted)
 def test():
     db = create_connection(DB_NAME)
-    user1 = User()
-    user1.create_account(db)
+    user1 = User(db)
+    user1.create_account()
+    user1.logout
+    user1.username = 'tmh'
+    user1.password = '1'
+    user1.login()
 
 
 
@@ -56,11 +60,11 @@ def test():
     db.commit()
 
 
-    user = User()
+    user = User(db)
     user.username = 'tannermhess'
     user.payment_info['cc'] = 1234123412341234
     user.payment_info['cc_cvv'] = 111
-    work = user.cart.add(book, 10, db)
+    work = user.cart.add(book, 10)
     print(str(work))
     sql = 'SELECT * FROM Cart WHERE username=?'
     values = (user.username,)
@@ -70,7 +74,7 @@ def test():
         print(row)
     user.view_cart()
 
-    worked = user.cart.add(book, 4, db)
+    worked = user.cart.add(book, 4)
     sql = 'SELECT * FROM Cart WHERE username=?'
     print(str(worked))
     values = (user.username,)
@@ -80,7 +84,7 @@ def test():
         print(row)
     user.view_cart()
 
-    worked = user.cart.remove(0, 2, db)
+    worked = user.cart.remove(0, 2)
     sql = 'SELECT * FROM Cart WHERE username=?'
     print(str(worked))
     values = (user.username,)
@@ -90,7 +94,7 @@ def test():
         print(row)
     user.view_cart()
 
-    worked = user.cart.remove(0, 15, db)
+    worked = user.cart.remove(0, 15)
     sql = 'SELECT * FROM Cart WHERE username=?'
     print(str(worked))
     values = (user.username,)
@@ -101,9 +105,9 @@ def test():
     user.view_cart()
 
 
-    worked = user.cart.add(book, 4, db)
+    worked = user.cart.add(book, 4)
     print(str(worked))
-    worked = user.cart.empty(db)
+    worked = user.cart.empty()
     sql = 'SELECT * FROM Cart WHERE username=?'
     print(str(worked))
     values = (user.username,)
@@ -113,10 +117,10 @@ def test():
         print(row)
     user.cart.display_cart()
 
-    user.cart.add(book, 8, db)
-    user.cart.remove(0,5,db)
+    user.cart.add(book, 8)
+    user.cart.remove(0,5)
     user.cart.display_cart()
-    user.cart.checkout(db)
+    user.cart.checkout()
     user.cart.display_cart()
     sql = 'SELECT * FROM Orders WHERE username=?'
     values = (user.username,)
