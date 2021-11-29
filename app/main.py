@@ -10,28 +10,45 @@ def main():
 
 
 def menuing():
+    db = create_connection(DB_NAME)
     run = True
-    current_user = User()
+    current_user = User(db)
     while run == True:
-        print("====================Main Menu====================")
+        print("====================Main Menu====================\n")
         # If the user is logged in: menu
         if current_user.logged_in:
             pass
         # If the user is not logged in: menu
         else:
-            choice = -1
-            while choice not in [1, 2, 3]:
-                choice = input("1) Login\n2) Logout\n3) Exit Program \nEnter your choice: ")
+            choice = '-1'
+            while choice not in ['1', '2', '3']:
+                choice = input("1) Login\n2) Create Account\n3) Exit Program \nEnter your choice: ")
+            if choice == '1':
+                print("\n====================Login====================\n")
+                current_user.username = input("Enter your username: ")
+                pw = input("Enter your password: ")
+                if current_user.login(pw):
+                    continue
+                else: choice = '-1'
+            elif choice == '2':
+                print("====================Register====================\n")
+                current_user.create_account()
+                continue
+            elif choice == '3':
+                run = False
 
 
 
 # Tests for the shopping cart class (to be deleted)
 def test():
     db = create_connection(DB_NAME)
+    Tanner_Branch
+    user1 = User(db)
+    user1.create_account()
+    user1.logout
+    user1.username = 'tmh'
+    user1.login('12')
     remake_db(db)
-    user1 = User()
-    user1.create_account(db)
-    value = user1.login('con505doug', 'hello1', db)
 
 
     print('\n\n')
@@ -51,11 +68,11 @@ def test():
     db.commit()
 
 
-    user = User()
+    user = User(db)
     user.username = 'tannermhess'
     user.payment_info['cc'] = 1234123412341234
     user.payment_info['cc_cvv'] = 111
-    work = user.cart.add(book, 10, db)
+    work = user.cart.add(book, 10)
     print(str(work))
     sql = 'SELECT * FROM Cart WHERE username=?'
     values = (user.username,)
@@ -65,7 +82,7 @@ def test():
         print(row)
     user.view_cart()
 
-    worked = user.cart.add(book, 4, db)
+    worked = user.cart.add(book, 4)
     sql = 'SELECT * FROM Cart WHERE username=?'
     print(str(worked))
     values = (user.username,)
@@ -75,7 +92,7 @@ def test():
         print(row)
     user.view_cart()
 
-    worked = user.cart.remove(0, 2, db)
+    worked = user.cart.remove(0, 2)
     sql = 'SELECT * FROM Cart WHERE username=?'
     print(str(worked))
     values = (user.username,)
@@ -85,7 +102,7 @@ def test():
         print(row)
     user.view_cart()
 
-    worked = user.cart.remove(0, 15, db)
+    worked = user.cart.remove(0, 15)
     sql = 'SELECT * FROM Cart WHERE username=?'
     print(str(worked))
     values = (user.username,)
@@ -96,9 +113,9 @@ def test():
     user.view_cart()
 
 
-    worked = user.cart.add(book, 4, db)
+    worked = user.cart.add(book, 4)
     print(str(worked))
-    worked = user.cart.empty(db)
+    worked = user.cart.empty()
     sql = 'SELECT * FROM Cart WHERE username=?'
     print(str(worked))
     values = (user.username,)
@@ -108,10 +125,10 @@ def test():
         print(row)
     user.cart.display_cart()
 
-    user.cart.add(book, 8, db)
-    user.cart.remove(0,5,db)
+    user.cart.add(book, 8)
+    user.cart.remove(0,5)
     user.cart.display_cart()
-    user.cart.checkout(db)
+    user.cart.checkout()
     user.cart.display_cart()
     sql = 'SELECT * FROM Orders WHERE username=?'
     values = (user.username,)
@@ -120,5 +137,6 @@ def test():
     for row in rows:
         print(row)
 if __name__=="__main__":
-    main()
-    test()
+    #main()
+    #test()
+    menuing()
