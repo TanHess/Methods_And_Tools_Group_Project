@@ -96,6 +96,8 @@ def menuing():
                             new_first_name = input("\nEnter your first name: ")
                             new_last_name = input("Enter your last nbame ")
                             conf = input("\nApply changes?\n1) Yes\n2) No\nSelection: ")
+                            if conf == '1':
+                                current_user.first_name = new_first_name
                         # Edit Username info
                         elif account_choice == '2':
                             pass
@@ -159,13 +161,13 @@ def menuing():
 # Tests for the shopping cart class (to be deleted)
 def test():
     db = create_connection(DB_NAME)
-    Tanner_Branch
     user1 = User(db)
     user1.create_account()
     user1.logout
     user1.username = 'tmh'
     user1.login('12')
     remake_db(db)
+
 
 
     print('\n\n')
