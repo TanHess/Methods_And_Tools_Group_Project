@@ -109,11 +109,9 @@ class User():
             self.city = account[3]
             self.state = account[4]
             self.zip = account[5]
-            self.cart = ShoppingCart(self)
             self.logged_in = True
             self.payment_info = {"cc": account[6], "cc_cvv": account[7]}
             self.pwd_info = {"salt": salt, "key": key}
-            self.initialize_cart(db)
             print("Successfully logged in!")
             return
         else:

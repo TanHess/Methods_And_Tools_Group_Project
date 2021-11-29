@@ -12,9 +12,10 @@ def main():
 # Tests for the shopping cart class (to be deleted)
 def test():
     db = create_connection(DB_NAME)
+    remake_db(db)
     user1 = User()
     user1.create_account(db)
-
+    value = user1.login('con505doug', 'hello1', db)
 
 
     print('\n\n')
