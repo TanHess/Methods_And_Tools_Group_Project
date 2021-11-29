@@ -88,37 +88,108 @@ def menuing():
                     print("\n====================Edit Account====================\n")
                     account_choice = '-1'
                     print(repr(current_user))
-                    conf = '-1'
-                    while account_choice not in ['1', '2', '3', '4', '5','6','7','8']:
-                        account_choice = input("Select what you wish to alter:\n1) Name\n2) Username\n3) Password\n4) Address\n5) State\n6) City\n7) Zip\n8) Credit Card Information\nSelection: ")
+                    while account_choice not in ['1', '2', '3', '4', '5','6','7','8', '9']:
+                        conf = '-1'
+                        account_choice = input("Select what you wish to alter:\n1) Go Back\n2) Name\n3) Username\n4) Password\n5) Address\n6) State\n7) City\n8) Zip\n9) Credit Card Information\nSelection: ")
                         # Edit Name info
-                        if account_choice == '1':
+                        if account_choice == '2':
                             new_first_name = input("\nEnter your first name: ")
-                            new_last_name = input("Enter your last nbame ")
+                            new_last_name = input("Enter your last name ")
                             conf = input("\nApply changes?\n1) Yes\n2) No\nSelection: ")
                             if conf == '1':
                                 current_user.first_name = new_first_name
+                                current_user.last_name = new_last_name
+                                current_user.update_account()
+                                print("\nSuccessfully changed your name information!\n")
+                            else:
+                                print("\nChanges reverted.\n")
+                            account_choice = '-1'
                         # Edit Username info
-                        elif account_choice == '2':
-                            pass
+                        elif account_choice == '3':
+                            new_username = input('\nEnter your new username: ')
+                            conf = input("\nApply changes?\n1) Yes\n2) No\nSelection: ")
+                            if conf == '1':
+                                current_user.username = new_username
+                                current_user.update_account()
+                                print("\nSuccessfully changed your username.\n")
+                            else:
+                                print("\nChanges reverted.\n")
+                            account_choice = '-1'
                         # Edit Password info
-                        if account_choice == '3':
-                            pass
+                        if account_choice == '4':
+                            new_password1 = input('\nEnter your new password: ')
+                            new_password2 = input('\nConfirm your new password: ')
+                            while new_password1 != new_password2:
+                                print("\nError, passwords do not match")
+                                new_password1 = input('\nEnter your new password: ')
+                                new_password2 = input('\nConfirm your new password: ')
+                            conf = input("\nApply changes?\n1) Yes\n2) No\nSelection: ")
+                            if conf == '1':
+                                current_user.username = new_username
+                                current_user.update_password(new_password1)
+                                print("\nSuccessfully changed your password.\n")
+                            else:
+                                print("\nChanges reverted.\n")
+                            account_choice = '-1'
                         # Edit Address info
-                        elif account_choice == '4':
-                            pass
+                        elif account_choice == '5':
+                            new_address= input("\nEnter your address: ")
+                            conf = input("\nApply changes?\n1) Yes\n2) No\nSelection: ")
+                            if conf == '1':
+                                current_user.address = new_address
+                                current_user.update_account()
+                                print("\nSuccessfully changed your address!\n")
+                            else:
+                                print("\nChanges reverted.\n")
+                            account_choice = '-1'
                         # Edit State info
-                        if account_choice == '5':
-                            pass
+                        if account_choice == '6':
+                            new_first_name = input("\nEnter your first name: ")
+                            new_last_name = input("Enter your last name ")
+                            conf = input("\nApply changes?\n1) Yes\n2) No\nSelection: ")
+                            if conf == '1':
+                                current_user.first_name = new_first_name
+                                current_user.last_name = new_last_name
+                                current_user.update_account()
+                                print("\nSuccessfully changed your name information!\n")
+                            else:
+                                print("\nChanges reverted.\n")
+                            account_choice = '-1'
                         # Edit City info
-                        elif account_choice == '6':
-                            pass
+                        elif account_choice == '7':
+                            new_city = input("\nEnter your city: ")
+                            conf = input("\nApply changes?\n1) Yes\n2) No\nSelection: ")
+                            if conf == '1':
+                                current_user.city = new_city
+                                current_user.update_account()
+                                print("\nSuccessfully changed your city!\n")
+                            else:
+                                print("\nChanges reverted.\n")
+                            account_choice = '-1'
                         # Edit Zip info
-                        if account_choice == '7':
-                            pass
+                        if account_choice == '8':
+                            new_zip = input("\nEnter your zip: ")
+                            conf = input("\nApply changes?\n1) Yes\n2) No\nSelection: ")
+                            if conf == '1':
+                                current_user.zip = new_zip
+                                current_user.update_account()
+                                print("\nSuccessfully changed your name information!\n")
+                            else:
+                                print("\nChanges reverted.\n")
+                            account_choice = '-1'
                         # Edit Credit Card info
-                        elif account_choice == '8':
-                            pass
+                        elif account_choice == '9':
+                            new_cc_number = input("\nEnter your credit card number: ")
+                            new_cc_cvv = input("Enter your credit card CVV: ")
+                            conf = input("\nApply changes?\n1) Yes\n2) No\nSelection: ")
+                            if conf == '1':
+                                current_user.payment_info['cc'] = new_cc_number
+                                current_user.last_name['cc_cvv'] = new_cc_cvv
+                                current_user.update_account()
+                                print("\nSuccessfully changed your name information!\n")
+                            else:
+                                print("\nChanges reverted.\n")
+                            account_choice = '-1'
 
 
 

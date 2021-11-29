@@ -3,7 +3,7 @@
 
 class Book():
 
-    def __init__(self) -> None:
+    def __init__(self, db) -> None:
         self.quantity = 0
         self.ISBN = 0
         self.title = ''
@@ -11,6 +11,7 @@ class Book():
         self.author = ''
         self.genre = ''
         self.format = ''
+        self.db = db
 
     def __repr__(self):
         visual = '==============================================\n'
@@ -26,7 +27,7 @@ class Book():
         return visual
 
 
-    def remove_from_db():
+    def remove_from_db(self):
         pass
 
 
@@ -34,6 +35,7 @@ class Book():
         sql = 'INSERT INTO Books(quantity, ISBN, title, author, genre, bookFormat)'
         values = (self.quantity, self.ISBN, self.title, self.author, self.genre, self.format)
         sql = 'SET '
+        cur = self.db.cursor()
 
         # Add to db just adds the current book object to db
 
