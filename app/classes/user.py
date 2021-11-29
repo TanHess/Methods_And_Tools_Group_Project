@@ -19,6 +19,17 @@ class User():
         self.db = db
         self.cart = ShoppingCart(self, db=self.db)
 
+    def __repr__(self):
+        visual = '==============================================\n'
+        visual += 'First Name: ' + self.first_name + '\n| '
+        visual += 'Last Name: ' + self.last_name+ '\n| '
+        visual += 'Username: ' + self.username + '\n| '
+        visual += 'Address: ' + self.address +'\n| '
+        visual += 'State: ' + self.state +'\n'
+        visual += 'Zip: ' + self.zip + '\n| '
+        visual += 'Credit Card Number: ' + str(self.payment_info.get('cc')) + 'CVV: ' + str(self.payment_info.get('cc_cvv')) + '\n| '
+        visual += '=============================================='
+        return visual
     
     def initialize_cart(self):
         self.cart.get_cart()
@@ -53,24 +64,36 @@ class User():
 
     def create_account(self):
         print("Please fill out the info to create your account")
-        self.first_name = input("First Name: ")
-        self.last_name = input("Last Name: ")
-        username = input("Username: ")
-        if self.check_username(username):
-            self.username = username
-        else:
-            while not self.check_username(username):
-                print("Username taken!")
-                username = input("Username: ")
-            self.username = username
-        password = input("Password: ")
-        self.hash_password(password)
-        self.address = input("Street: ")
-        self.city = input("City: ")
-        self.state = input("State: ")
-        self.zip = input("Zip: ")
-        self.payment_info["cc"] = input("Credit Card Number: ")
-        self.payment_info["cc_cvv"] = input("CVV: ")
+        confirm = '-1'
+        while confirm != '1':
+            self.first_name = input("First Name: ")
+            self.last_name = input("Last Name: ")
+            username = input("Username: ")
+            if self.check_username(username):
+                self.username = username
+            else:
+                while not self.check_username(username):
+                    print("Username taken!")
+                    username = input("Username: ")
+                self.username = username
+            password1 = input("Password: ")
+            password2 = input("Confirm Password: ")     
+            while password1 != password2:           # Confirm the passwords match. 
+                print("Error, passwords do not match!")
+                password1 = input("Password: ")
+                password2 = input("Confirm Password: ")
+            self.hash_password(password1)
+            self.address = input("Street: ")
+            self.city = input("City: ")
+            self.state = input("State: ")
+            self.zip = input("Zip: ")
+            self.payment_info["cc"] = input("Credit Card Number: ")
+            self.payment_info["cc_cvv"] = input("CVV: ")
+            print("Ensure that all of your info is correct:")
+            print(repr(self))   # Print the user data in a readable way
+            confirm = input('\n1) Yes, this is correct\n2) No, go back\n Selection: ') # Give user option to go back and change info.
+            while confirm not in ['1', '2']:
+                confirm = input('Error! Please enter a valid selection!\n Selection: ')
 
         cur = self.db.cursor()
         sql = ''' INSERT INTO Users(first_name, last_name, username, password_salt, password_key, address, city, state, zip, cc_number, cc_cvv)
@@ -85,7 +108,7 @@ class User():
         cur.execute(sql, (self.username,))
         self.db.commit()
 
-    def login(self):
+    def login(self, password):
         cur = self.db.cursor()
         sql = 'SELECT username, password_salt, password_key FROM Users WHERE username=?'
         cur.execute(sql, (self.username,))
@@ -97,7 +120,7 @@ class User():
         username = account[0]
         salt = account[1]
         key = account[2]
-        new_key = hashlib.pbkdf2_hmac('sha256', self.password.encode('utf-8'), salt, 100000)
+        new_key = hashlib.pbkdf2_hmac('sha256', password.encode('utf-8'), salt, 100000)
 
         if key == new_key:
             sql = 'SELECT first_name, last_name, address, city, state, zip, cc_number, cc_cvv FROM Users WHERE username=?'
@@ -116,10 +139,10 @@ class User():
             self.pwd_info = {"salt": salt, "key": key}
             self.initialize_cart()
             print("Successfully logged in!")
-            return
+            return True
         else:
             print("Either the username or password is incorrect!")
-            return
+            return False
 
     def logout(self):
         self.first_name = ''

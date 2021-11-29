@@ -10,23 +10,31 @@ def main():
 
 
 def menuing():
+    db = create_connection(DB_NAME)
     run = True
-    current_user = User()
+    current_user = User(db)
     while run == True:
-        print("====================Main Menu====================")
+        print("====================Main Menu====================\n")
         # If the user is logged in: menu
         if current_user.logged_in:
             pass
         # If the user is not logged in: menu
         else:
-            choice = -1
-            while choice not in [1, 2, 3]:
-                choice = input("1) Login\n2) Logout\n3) Exit Program \nEnter your choice: ")
-            if choice == 1:
-                pass
-            elif choice == 2:
-                pass
-            elif choice == 3:
+            choice = '-1'
+            while choice not in ['1', '2', '3']:
+                choice = input("1) Login\n2) Create Account\n3) Exit Program \nEnter your choice: ")
+            if choice == '1':
+                print("\n====================Login====================\n")
+                current_user.username = input("Enter your username: ")
+                pw = input("Enter your password: ")
+                if current_user.login(pw):
+                    continue
+                else: choice = '-1'
+            elif choice == '2':
+                print("====================Register====================\n")
+                current_user.create_account()
+                continue
+            elif choice == '3':
                 run = False
 
 
@@ -38,8 +46,7 @@ def test():
     user1.create_account()
     user1.logout
     user1.username = 'tmh'
-    user1.password = '1'
-    user1.login()
+    user1.login('12')
 
 
 
@@ -129,5 +136,6 @@ def test():
     for row in rows:
         print(row)
 if __name__=="__main__":
-    main()
-    test()
+    #main()
+    #test()
+    menuing()
