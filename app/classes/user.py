@@ -41,7 +41,7 @@ class User():
         self.cart.empty()
 
     def checkout(self, verify=False):
-        self.cart.checkout(verify)
+        return self.cart.checkout(verify)
 
     def view_cart(self):
         self.cart.display_cart()
@@ -156,6 +156,9 @@ class User():
         self.logged_in = False
         self.payment_info = {"cc": 0, "cc_cvv": 0}
         self.pwd_info = {"salt": 0, "key": 0}
+
+    def update_account(self):
+        sql = '''SET first_name=?, '''
 
 
 
