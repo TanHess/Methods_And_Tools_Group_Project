@@ -53,7 +53,7 @@ class ShoppingCart():
     # In the real world, much more verification would take place but this is fake payment info anyways.
     def verify_payment_info(self) -> bool:
         cur = self.db.cursor()
-        sql = 'SELECT cc FROM USERS WHERE username=?'
+        sql = 'SELECT cc_number FROM USERS WHERE username=?'
         user_tuple=(self.user.username,)
         cur.execute(sql,user_tuple)
         cc = int(cur.fetchone()[0])
@@ -102,7 +102,6 @@ class ShoppingCart():
                 self.refresh_price()
                 return True
         except:
-            print('Unkown error occured.')
             return False
 
 
@@ -157,7 +156,7 @@ class ShoppingCart():
 
 
 
-    def checkout(self, verify=False) -> None:
+    def checkout(self, verify=False) -> bool:
         self.get_cart()         # Re-gathers the local cart to ensure that there is no discontinuity between the client cart and the self.db cart
         self.refresh_price()   # Ensure self.total_cost is up to date. 
         cur = self.db.cursor()
@@ -199,6 +198,7 @@ class ShoppingCart():
             cur.execute(sql, values)
             self.db.commit()
         self.empty() # Finally, empty the user's cart.
+        return True
 
 
 
