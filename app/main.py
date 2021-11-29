@@ -1,9 +1,13 @@
 from database_manager import create_connection, TABLES, init_database, DB_NAME, clear_all_db
 from classes.book import Book
 from classes.user import User
+from classes.inventory import Inventory
 
 def main():
     db = create_connection(DB_NAME)
+    """  Inv = Inventory(db)
+    gotbook = Inv.retrieveBook(12345)
+    print(gotbook) """
     clear_all_db(db)
 
 
@@ -29,7 +33,7 @@ def test():
 
     user = User()
     user.username = 'tannermhess'
-    user.payment_info['cc'] = 1234123412341234
+    user.payment_info['cc'] = 12341234123451234
     user.payment_info['cc_cvv'] = 111
     work = user.cart.add(book, 10, db)
     print(str(work))
@@ -96,5 +100,7 @@ def test():
     for row in rows:
         print(row)
 if __name__=="__main__":
-    main()
     test()
+    main()
+   
+    
