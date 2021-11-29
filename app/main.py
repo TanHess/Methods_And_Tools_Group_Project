@@ -9,10 +9,38 @@ def main():
     #init_database(db, TABLES)
 
 
+def menuing():
+    run = True
+    current_user = User()
+    while run == True:
+        print("====================Main Menu====================")
+        # If the user is logged in: menu
+        if current_user.logged_in:
+            pass
+        # If the user is not logged in: menu
+        else:
+            choice = -1
+            while choice not in [1, 2, 3]:
+                choice = input("1) Login\n2) Logout\n3) Exit Program \nEnter your choice: ")
+            if choice == 1:
+                pass
+            elif choice == 2:
+                pass
+            elif choice == 3:
+                run = False
+
+
+
 # Tests for the shopping cart class (to be deleted)
 def test():
     print('\n\n')
     db = create_connection(DB_NAME)
+    user1 = User()
+    user1.create_account(db)
+
+
+
+    print('\n\n')
     book = Book()
     book.ISBN = 12345
     book.title = 'The Lion, The Which, And The Wardrobe'
@@ -41,7 +69,7 @@ def test():
     rows = cur.fetchall()
     for row in rows:
         print(row)
-    user.cart.display_cart()
+    user.view_cart()
 
     worked = user.cart.add(book, 4, db)
     sql = 'SELECT * FROM Cart WHERE username=?'
@@ -51,7 +79,7 @@ def test():
     rows = cur.fetchall()
     for row in rows:
         print(row)
-    user.cart.display_cart()
+    user.view_cart()
 
     worked = user.cart.remove(0, 2, db)
     sql = 'SELECT * FROM Cart WHERE username=?'
@@ -61,7 +89,7 @@ def test():
     rows = cur.fetchall()
     for row in rows:
         print(row)
-    user.cart.display_cart()
+    user.view_cart()
 
     worked = user.cart.remove(0, 15, db)
     sql = 'SELECT * FROM Cart WHERE username=?'
@@ -71,7 +99,7 @@ def test():
     rows = cur.fetchall()
     for row in rows:
         print(row)
-    user.cart.display_cart()
+    user.view_cart()
 
 
     worked = user.cart.add(book, 4, db)
