@@ -115,7 +115,7 @@ class User():
         cur.execute(sql, (self.username,))
         account = cur.fetchone()
         if account == None:
-            print("Either the username or password is incorrect!")
+            print("\nEither the username or password is incorrect!\n")
             return
 
         username = account[0]
