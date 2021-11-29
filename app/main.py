@@ -125,7 +125,6 @@ def menuing():
                                 new_password2 = input('\nConfirm your new password: ')
                             conf = input("\nApply changes?\n1) Yes\n2) No\nSelection: ")
                             if conf == '1':
-                                current_user.username = new_username
                                 current_user.update_password(new_password1)
                                 print("\nSuccessfully changed your password.\n")
                             else:
@@ -169,27 +168,39 @@ def menuing():
                         # Edit Zip info
                         if account_choice == '8':
                             new_zip = input("\nEnter your zip: ")
-                            conf = input("\nApply changes?\n1) Yes\n2) No\nSelection: ")
-                            if conf == '1':
-                                current_user.zip = new_zip
-                                current_user.update_account()
-                                print("\nSuccessfully changed your name information!\n")
-                            else:
-                                print("\nChanges reverted.\n")
+                            try: 
+                                new_zip = int(new_zip)
+                                conf = input("\nApply changes?\n1) Yes\n2) No\nSelection: ")
+                                if conf == '1':
+                                    current_user.zip = new_zip
+                                    current_user.update_account()
+                                    print("\nSuccessfully changed your name information!\n")
+                                else:
+                                    print("\nChanges reverted.\n")
+                                account_choice = '-1'
+                            except:
+                                print("\nError, invalid choice, please only integers.\n")
                             account_choice = '-1'
                         # Edit Credit Card info
                         elif account_choice == '9':
                             new_cc_number = input("\nEnter your credit card number: ")
                             new_cc_cvv = input("Enter your credit card CVV: ")
-                            conf = input("\nApply changes?\n1) Yes\n2) No\nSelection: ")
-                            if conf == '1':
-                                current_user.payment_info['cc'] = new_cc_number
-                                current_user.last_name['cc_cvv'] = new_cc_cvv
-                                current_user.update_account()
-                                print("\nSuccessfully changed your name information!\n")
-                            else:
-                                print("\nChanges reverted.\n")
-                            account_choice = '-1'
+                            try: 
+                                new_cc_number = int(new_cc_number)
+                                new_cc_cvv = int(new_cc_cvv)
+                                conf = input("\nApply changes?\n1) Yes\n2) No\nSelection: ")
+                                if conf == '1':
+                                    current_user.payment_info["cc"] = new_cc_number
+                                    current_user.payment_info["cc_cvv"] = new_cc_cvv
+                                    current_user.update_account()
+                                    print("\nSuccessfully changed your name information!\n")
+                                else:
+                                    print("\nChanges reverted.\n")
+                                print("\nError, invalid choice, please only integers.\n")
+                                account_choice = '-1'
+                            except:
+                                print("\nError, invalid choice, please only integers.\n")
+                                account_choice = '-1'
 
 
 
@@ -199,7 +210,7 @@ def menuing():
 
                 # Logout
                 elif choice == '6':
-                    pass
+                    current_user.logout()
 
 
 

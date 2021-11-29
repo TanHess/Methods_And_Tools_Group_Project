@@ -164,6 +164,7 @@ class User():
         sql = '''UPDATE Users SET first_name=?, last_name=?, username=?, address=?, city=?, state=?, zip=?, cc_number=?, cc_cvv=? WHERE username=?'''
         values = (self.first_name, self.last_name, self.username, self.address, self.city, self.state, self.zip, self.payment_info.get("cc"), self.payment_info.get("cc_cvv"), self.username)
         cur.execute(sql, values)
+        self.db.commit()
 
     def update_password(self, password):
         self.hash_password(password)
@@ -171,5 +172,6 @@ class User():
         sql = 'UPDATE Users SET password_salt=?, password_key=? WHERE username=? '
         values = (self.pwd_info.get("salt"), self.pwd_info.get("key"), self.username)
         cur.execute(sql, values)
+        self.db.commit()
 
 
