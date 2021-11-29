@@ -20,15 +20,16 @@ class User():
         self.cart = ShoppingCart(self, db=self.db)
 
     def __repr__(self):
-        visual = '==============================================\n'
+        visual = '=================ACCOUNT INFO=================\n| '
         visual += 'First Name: ' + self.first_name + '\n| '
         visual += 'Last Name: ' + self.last_name+ '\n| '
         visual += 'Username: ' + self.username + '\n| '
         visual += 'Address: ' + self.address +'\n| '
-        visual += 'State: ' + self.state +'\n'
-        visual += 'Zip: ' + self.zip + '\n| '
-        visual += 'Credit Card Number: ' + str(self.payment_info.get('cc')) + 'CVV: ' + str(self.payment_info.get('cc_cvv')) + '\n| '
-        visual += '=============================================='
+        visual += 'State: ' + self.state +'\n| '
+        visual += 'Zip: ' + str(self.zip) + '\n| '
+        visual += 'Credit Card Number: ' + str(self.payment_info.get('cc')) + '\n| '
+        visual += 'CVV: ' + str(self.payment_info.get('cc_cvv')) + '\n'
+        visual += '==============================================\n'
         return visual
     
     def initialize_cart(self):
