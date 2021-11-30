@@ -85,7 +85,7 @@ def menuing():
                             elif new_info_flag == '2':
                                 cc = input("Enter your credit cart number: ")
                                 cc_cvv = input("Enter your CVV: ")
-                                confirm = input("\nFinal Confirmation: Do you wish to checkout?\n1) Yes\n2) No")
+                                confirm = input("\nFinal Confirmation: Do you wish to checkout?\n1) Yes\n2) No\nSelection: ")
                                 if confirm == '1':
                                     success = current_user.checkout()
                                     if success:
@@ -345,7 +345,8 @@ def menuing():
                         elif orders_choice == '2':
                             specified_order = '-1'
                             while specified_order not in valid_orders:
-                                specified_order = input("Please enter an order number to view that order: ")
+                                specified_order = input("\nPlease enter an order number to view that order: ")
+                            print()
                             current_user.display_specific_order(specified_order)
                             orders_choice = '-1'
 
@@ -495,7 +496,6 @@ def book_test():
     inv.displayFormats()
     inv.displayGenres()
     #print(cur.fetchall())
-
 
 if __name__=="__main__":
     #main()
