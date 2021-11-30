@@ -25,6 +25,7 @@ class User():
         visual += 'Last Name: ' + self.last_name+ '\n| '
         visual += 'Username: ' + self.username + '\n| '
         visual += 'Address: ' + self.address +'\n| '
+        visual += 'City: ' + self.city + '\n| '
         visual += 'State: ' + self.state +'\n| '
         visual += 'Zip: ' + str(self.zip) + '\n| '
         visual += 'Credit Card Number: ' + str(self.payment_info.get('cc')) + '\n| '
@@ -36,7 +37,7 @@ class User():
         self.cart.get_cart()
 
     def add_to_cart(self, book, qty):
-        self.cart.add(self, book, qty)
+        return self.cart.add(book, qty)
 
     def empty_cart(self):
         self.cart.empty()
@@ -102,12 +103,21 @@ class User():
         values = (self.first_name, self.last_name, self.username, self.pwd_info.get("salt"), self.pwd_info.get("key"), self.address, self.city, self.state, self.zip, self.payment_info.get("cc"), self.payment_info.get("cc_cvv"))
         cur.execute(sql, values)
         self.db.commit()
+        self.logged_in = True
 
+    # Deletes all user account, shopping cart, and order data.
     def delete_account(self):
         cur = self.db.cursor()
         sql = 'DELETE FROM Users WHERE username=?'
         cur.execute(sql, (self.username,))
         self.db.commit()
+        sql = 'DELETE FROM Cart WHERE username=?'
+        cur.execute(sql,(self.username,))
+        self.db.commit()
+        sql = 'DELETE FROM Orders WHERE username=?'
+        cur.execute(sql,(self.username,))
+        self.db.commit()
+        self.logout()
 
     def login(self, password):
         cur = self.db.cursor()
@@ -174,4 +184,59 @@ class User():
         cur.execute(sql, values)
         self.db.commit()
 
+    def display_order_history(self):
+        sql = "SELECT DISTINCT order_number From Orders WHERE username=?"
+        value = (self.username,)
+        cur = self.db.cursor()
+        cur.execute(sql, value)
+        orders = cur.fetchall()
+        return_list = []
+        for order in orders:
+            return_list.append(str(order[0]))
+            sql = "SELECT date, quantity, total_cost FROM Orders WHERE username=? AND order_number=?"
+            values = (self.username, order[0])
+            cur.execute(sql,values)
+            items_of_order = cur.fetchall()
+            print('=========================================\n| ORDER NUMBER ' + str(order[0]))
+            total_quantity = 0
+            for item in items_of_order:
+                total_quantity += item[1]
+            print('-----------------------------------------')
+            print('| Date ordered: ' + str(items_of_order[0][0]))
+            print('| Total items ordered: ' + str(total_quantity))
+            print('| Total cost: $' + str(item[2]))
+            print("========================================")
+        return return_list
 
+    
+    def display_specific_order(self, order_number):
+        cur = self.db.cursor()
+        sql = "SELECT title, date, quantity, total_cost FROM Orders WHERE username=? AND order_number=?"
+        values = (self.username, order_number)
+        cur.execute(sql,values)
+        items_of_order = cur.fetchall()
+        print('=========================================\n| ORDER NUMBER ' + str(order_number))
+        print('-----------------------------------------')
+        total_quantity = 0
+        for item in items_of_order:
+            print('| ' + item[0] + ":  " + str(item[2]) +" ordered")
+            total_quantity += item[2]
+        print('-----------------------------------------')
+        print('| Date Ordered: ' + str(items_of_order[0][1]))
+        print('| Total items ordered: ' + str(total_quantity))
+        print('| Total cost: $' + str(item[3]))
+        print("=========================================")
+
+    
+    def check_password(self, password):
+        cur = self.db.cursor()
+        sql = 'SELECT username, password_salt, password_key FROM Users WHERE username=?'
+        cur.execute(sql, (self.username,))
+        account = cur.fetchone()
+        salt = account[1]
+        key = account[2]
+        new_key = hashlib.pbkdf2_hmac('sha256', password.encode('utf-8'), salt, 100000)
+        if key == new_key:
+            return True
+        else:
+            return False

@@ -1,4 +1,5 @@
-from database_manager import create_connection, TABLES, init_database, DB_NAME, clear_all_db, remake_db
+from classes.inventory import Inventory
+from database_manager import create_connection, TABLES, init_database, DB_NAME, clear_all_db, remake_db, reset_to_default
 from classes.book import Book
 from classes.user import User
 
@@ -11,22 +12,39 @@ def main():
 
 def menuing():
     db = create_connection(DB_NAME)
+    inv = Inventory(db)
     run = True
     current_user = User(db)
+
+    # Encapsulating this function for easier menuing overall (this will be used multiple times)
+    def add_item_menu():
+        print("\n================Add Item To Cart================\n")
+        while True:
+            isbn = input("Enter the ISBN: ")
+            qty = input("Enter the quantity: ")
+            try:
+                isbn = int(isbn)
+                qty = int(qty)
+                book = inv.retrieveBook(isbn)
+                return current_user.add_to_cart(book, qty)
+            except:
+                print("\nError, only valid choices please!")
+
+
     while run == True:
         # If the user is logged in: menu
         if current_user.logged_in:
-            print("====================Main Menu====================\n")
             choice = '-1'
-            while choice not in ['1', '2', '3', '4', '5', '6']:
-                choice = input('1) View Cart\n2) Browse All Items in Inventory\n3) Browse Books by Genre\n4) Edit Account\n5) Delete Account\n6) Logout\nSelection: ')
+            while choice not in ['1', '2', '3', '4', '5', '6','7']:
+                print("\n\n====================Main Menu====================\n")
+                choice = input('1) View Cart\n2) Browse All Items in Inventory\n3) Browse Books by a Category\n4) Edit Account\n5) Delete Account\n6) View Past Orders\n7) Logout\nSelection: ')
                 # View Cart
                 if choice == '1':
                     print("====================Cart Options====================\n")
                     cart_choice = '-1'
                     current_user.view_cart()
                     while cart_choice not in ['1', '2', '3','4']:
-                        cart_choice = input("1) Go back\n2) Remove Item\n3) Empty Cart\n4) Checkout\n Selection: ")
+                        cart_choice = input("\n1) Go back\n2) Remove Item\n3) Empty Cart\n4) Checkout\n Selection: ")
                         # Go back
                         if cart_choice == '1':
                             choice == '-1'
@@ -41,7 +59,7 @@ def menuing():
                                 print("\nError, either index or quantity invalid.")
                                 cart_choice = '-1'
                                 continue
-                            flag = current_user.cart.remove(index, qty)
+                            flag = current_user.cart.remove(index-1, qty)
                             if flag == True:
                                 print('\nSuccess! Item removed from your cart.')
                             else:
@@ -63,7 +81,7 @@ def menuing():
                                 if confirm == '1':
                                     success = current_user.checkout(verify=True)
                                     if success:
-                                        print("\nSuccess! You have checked out your cart.")
+                                        print("\nSuccess! You have checked out your cart.\n")
                             elif new_info_flag == '2':
                                 cc = input("Enter your credit cart number: ")
                                 cc_cvv = input("Enter your CVV: ")
@@ -71,17 +89,100 @@ def menuing():
                                 if confirm == '1':
                                     success = current_user.checkout()
                                     if success:
-                                        print("\nSuccess! You have checked out your cart.")
+                                        print("\nSuccess! You have checked out your cart.\n")
                             choice = '-1'
 
 
                 # Browse All
                 elif choice == '2':
-                    pass
+                    print("\n====================Category Selection====================")
+                    inv.displayAll()
+                    browse_choice = '-1'
+                    while browse_choice not in ['1','2']:
+                        browse_choice = input("\n1) Go Back\n2) Add a Book\nSelection: ")
+                        if browse_choice == '1':
+                            choice = '-1'
+                        elif browse_choice == '2':
+                            worked = add_item_menu()
+                            if worked == True:
+                                print("\nSuccessfully added item(s) to your cart!\n")
+                            browse_choice = '-1'
 
                 # Browse by genre
                 elif choice == '3':
-                    pass
+                    print("\n====================Category Selection====================")
+                    category_choice = '-1'
+                    while category_choice not in ['1','2','3','4']:
+                        category_choice = input("\n1) Go Back\n2) View By Genre\n3) View By Format\n4) View By Price\nSelection: ")
+
+                        # Display by genre
+                        if category_choice == '2':
+                            genres = inv.displayGenres()
+                            genre_choice = '-1'
+                            genre_inds = []
+                            for i in range(len(genres)):     # Arbitrarily long list of numbers for available choices.
+                                genre_inds.append(str(i+1))
+                            while genre_choice not in genre_inds:
+                                genre_choice = input("Selection: ")
+                            print()
+                            inv.displayByGenre(genres[int(genre_choice)-1])   # Display by selected genre
+                            add_choice = '-1'
+                            while add_choice not in ['1','2']:
+                                add_choice = input("\n1) Go Back\n2) Add Book\nSelection: ")
+                                if add_choice == '1':
+                                    category_choice = '-1'
+                                elif add_choice == '2':
+                                    worked = add_item_menu()
+                                    if worked == True:
+                                        print("\nSuccessfully added item(s) to your cart!\n")
+                                    category_choice = '-1'
+
+                        # Display by format
+                        elif category_choice == '3':
+                            formats = inv.displayFormats()
+                            format_choice = '-1'
+                            format_inds = []
+                            for i in range(len(formats)):     # Arbitrarily long list of numbers for available choices.
+                                format_inds.append(str(i+1))
+                            while format_choice not in format_inds:
+                                format_choice = input("Selection: ")
+                            print()
+                            inv.displayByFormat(formats[int(format_choice)-1])
+                            add_choice = '-1'
+                            while add_choice not in ['1','2']:
+                                add_choice = input("\n1) Go Back\n2) Add Book\nSelection: ")
+                                if add_choice == '1':
+                                    category_choice = '-1'
+                                elif add_choice == '2':
+                                    worked = add_item_menu()
+                                    if worked == True:
+                                        print("\nSuccessfully added item(s) to your cart!\n")
+                                    category_choice = '-1'
+
+                        # Display by price
+                        elif category_choice == '4':
+                            prices = [(5, 9.99), (10, 14.99), (15,19.99), (20,25.99)]   # List of price ranges as tuples
+                            print("\nPRICE RANGES:\n============================")
+                            price_choice = '-1'
+                            for count, price_range in enumerate(prices):
+                                print("| "+str(count+1)+" $"+str(price_range[0])+'<-->'+str(price_range[1]))
+                            while price_choice not in ['1','2','3','4']:
+                                price_choice = input("Selection: ")
+                            price_range = prices[int(price_choice)-1]
+                            print()
+                            inv.displayByPrice(price_range[0],price_range[1])
+                            add_choice = '-1'
+                            while add_choice not in ['1','2']:
+                                add_choice = input("\n1) Go Back\n2) Add Book\nSelection: ")
+                                if add_choice == '1':
+                                    category_choice = '-1'
+                                elif add_choice == '2':
+                                    worked = add_item_menu()
+                                    if worked == True:
+                                        print("\nSuccessfully added item(s) to your cart!\n")
+                                    category_choice = '-1'
+                            
+
 
                 # Edit user account
                 elif choice == '4':
@@ -118,7 +219,7 @@ def menuing():
                         # Edit Password info
                         if account_choice == '4':
                             new_password1 = input('\nEnter your new password: ')
-                            new_password2 = input('\nConfirm your new password: ')
+                            new_password2 = input('Confirm your new password: ')
                             while new_password1 != new_password2:
                                 print("\nError, passwords do not match")
                                 new_password1 = input('\nEnter your new password: ')
@@ -143,14 +244,12 @@ def menuing():
                             account_choice = '-1'
                         # Edit State info
                         if account_choice == '6':
-                            new_first_name = input("\nEnter your first name: ")
-                            new_last_name = input("Enter your last name ")
+                            new_state = input("\nEnter your state: ")
                             conf = input("\nApply changes?\n1) Yes\n2) No\nSelection: ")
                             if conf == '1':
-                                current_user.first_name = new_first_name
-                                current_user.last_name = new_last_name
+                                current_user.state = new_state
                                 current_user.update_account()
-                                print("\nSuccessfully changed your name information!\n")
+                                print("\nSuccessfully changed your state information!\n")
                             else:
                                 print("\nChanges reverted.\n")
                             account_choice = '-1'
@@ -206,10 +305,54 @@ def menuing():
 
                 # Delete user account
                 elif choice == '5':
-                    pass
+                    print('\n====================Delete Account====================')
+                    delete_choice = '-1'
+                    while delete_choice not in ['1','2']:
+                        delete_choice = input("\nAre you sure you want to delete your account?\nThis means all order data and cart data associated with this account.\n1) Yes, I'm Sure\n2) No, Take me back\nSelection: ")
+                        if delete_choice == '1':
+                            print("\nI thought I made it clear that this was clearly the WRONG answer, let me try one more time.")
+                            print("Are you SURE you want to delete your account???")
+                            delete_choice2 = input("1) Yes, Forget Reason\n2) No, I Have a Brain\nSelection: ")
+                            while delete_choice2 not in ['1','2']:
+                                delete_choice2 = input("Enter a valid selection please: ")
+                            if delete_choice2 == '1':
+                                pw = input("Fine you crazy person, enter your password to delete your account: ")
+                                if current_user.check_password(pw) == True:
+                                    current_user.delete_account()
+                                else:
+                                    print("Wow, lucked out there, you input the wrong password. If you want to try again though I can't stop you")
+                                    delete_choice2 = '-1'
+                            elif delete_choice2 == '2':
+                                print("\nGood move\n")
+                                choice = '-1'
+                        elif delete_choice == '2':
+                            choice = '-1'
+                
+
+                # Show Past Orders
+                elif choice == '6':
+                    orders_choice = '-1'
+                    print("\n====================Order History====================")
+                    valid_orders = current_user.display_order_history()
+                    while orders_choice not in ['1','2']:
+                        if bool(valid_orders) == False:     # If user has no order history yet
+                            print("\nYou have no orders yet!\n")     
+                            choice = '-1'
+                            break
+                        orders_choice = input("\n1) Go Back\n2) View Specific Order\nSelection: ")
+                        if orders_choice == '1':
+                            choice = '-1'
+                        elif orders_choice == '2':
+                            specified_order = '-1'
+                            while specified_order not in valid_orders:
+                                specified_order = input("Please enter an order number to view that order: ")
+                            current_user.display_specific_order(specified_order)
+                            orders_choice = '-1'
+
+                    
 
                 # Logout
-                elif choice == '6':
+                elif choice == '7':
                     current_user.logout()
 
 
@@ -337,7 +480,25 @@ def test():
     rows = cur.fetchall()
     for row in rows:
         print(row)
+
+
+
+
+def book_test():
+    db = create_connection(DB_NAME)
+    reset_to_default(db)
+    cur = db.cursor()
+    inv = Inventory(db)
+    print('\n')
+    inv.displayAll()
+    inv.displayByAuthor('George Orwell')
+    inv.displayFormats()
+    inv.displayGenres()
+    #print(cur.fetchall())
+
+
 if __name__=="__main__":
     #main()
     #test()
     menuing()
+    #book_test()

@@ -1,7 +1,7 @@
 # Tanner
 from datetime import date
 from .book import Book
-from copy import deepcopy
+from copy import copy
 
 class ShoppingCart():
     def __init__(self, user, db = None):
@@ -28,7 +28,7 @@ class ShoppingCart():
             isbn_tuple = (isbn_qty[0],)     # For fetching all the book information from the Books table
             cur.execute(sql, isbn_tuple)
             book = cur.fetchone()
-            book_to_add = Book()
+            book_to_add = Book(self.db)
             book_to_add.ISBN = book[0]
             book_to_add.title = book[1]
             book_to_add.author = book[2]
@@ -72,8 +72,8 @@ class ShoppingCart():
         if len(self.items) == 0:
             print("No items to display, your cart is empty!")
             return
-        for item in self.items:
-            print('\n1)')
+        for count, item in enumerate(self.items):
+            print('\n'+str(count+1)+")")
             print(item.__repr__() + '\n')
 
 
@@ -107,7 +107,7 @@ class ShoppingCart():
 
     def add(self, book, quantity) -> bool:
         # First, ensure that there are enough books in stock to supply the cart.
-        book_to_add = deepcopy(book)    # Prevent changing the original objects quantity by creating a new book object
+        book_to_add = copy(book)    # Prevent changing the original objects quantity by creating a new book object
         book_to_add.quantity = quantity
         cur = self.db.cursor()
         sql = 'SELECT quantity FROM BOOKS WHERE ISBN=?'
@@ -183,8 +183,8 @@ class ShoppingCart():
         max += 1            # New order_number to assign to all items going into the order table from this order.
         dt = date.today().strftime("%B %d, %Y")     # Current date (formatted) to put into the Orders table.
         for item in self.items:     # Next for loop adds each item to the orders table 
-            sql = 'INSERT INTO ORDERS(username, title, date, ISBN, quantity, order_number) VALUES(?,?,?,?,?,?)'
-            values = (self.user.username, item.title, dt, item.ISBN, item.quantity, max)    # All the values needed to insert into the Orders table
+            sql = 'INSERT INTO ORDERS(username, title, date, ISBN, quantity, order_number, total_cost) VALUES(?,?,?,?,?,?,?)'
+            values = (self.user.username, item.title, dt, item.ISBN, item.quantity, max, self.total_cost)    # All the values needed to insert into the Orders table
             cur.execute(sql, values)
             self.db.commit()
 
