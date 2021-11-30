@@ -3,7 +3,7 @@
 
 class Book():
 
-    def __init__(self) -> None:
+    def __init__(self, db) -> None:
         self.quantity = 0
         self.ISBN = 0
         self.title = ''
@@ -11,6 +11,7 @@ class Book():
         self.author = ''
         self.genre = ''
         self.format = ''
+        self.db = db
 
     def __repr__(self):
         visual = '==============================================\n'
@@ -48,3 +49,4 @@ class Book():
         values = (self.quantity, self.ISBN, self.title, self.price, self.author, self.genre, self.format)
         cur.execute(sql, values)
         db.commit()
+
