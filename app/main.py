@@ -2,16 +2,41 @@ from classes.inventory import Inventory
 from database_manager import create_connection, TABLES, init_database, DB_NAME, clear_all_db, remake_db, reset_to_default
 from classes.book import Book
 from classes.user import User
+import sys
 
+
+# Main function to setup database, accept system arguments, and run the menuing function.
 def main():
-    db = create_connection(DB_NAME)
-    #clear_all_db(db)
-    remake_db(db)
-    #init_database(db, TABLES)
+    db = create_connection(DB_NAME)     # Always make the database connection.
+    if len(sys.argv) > 2:
+        print("\n=============================\nError: System command invalid\n=============================\n")
+        exit(1)
+    if len(sys.argv) > 1:
+        if sys.argv[1] == 'RESET':      # If user wants to reset database to default 
+            print("\n===========================\nPREPARING TO RESET DATABASE\n===========================")
+            confirm = input("| Are you sure you want to reset the database? (This will delete all the current data)\n| 1) Yes\n| 2) No\n| Selection: ")
+            while confirm not in ['1', '2']:
+                confirm = input("Please enter a valid selection: ")
+            if confirm == '1':
+                print("\n==============\nDATABASE RESET\n==============\n")
+                reset_to_default(db)
+        elif sys.argv[1] == 'REFACTOR':  # If user has made a change to database schema that needs complete refactoring of database (Drops all tables, remakes db)
+            print("\n===============================\nPREPARING TO RESFACTOR DATABASE\n===============================")
+            confirm = input("| Are you sure you want to refactor the database? (This will delete all the current data)\n| 1) Yes\n| 2) No\n| Selection: ")
+            while confirm not in ['1', '2']:
+                confirm = input("Please enter a valid selection: ")
+            if confirm == '1':  
+                print("\n===================\nDATABASE REFACTORED\n===================\n")
+                remake_db(db)
+        else:
+            print("\n=============================\nError: System command invalid\n=============================\n")
+            exit(1)
+            
+    menuing(db)         # If the command entered was valid, or if no command was made, run the app through menuing.
 
 
-def menuing():
-    db = create_connection(DB_NAME)
+
+def menuing(db):
     inv = Inventory(db)
     run = True
     current_user = User(db)
@@ -361,9 +386,9 @@ def menuing():
                 
         # If the user is not logged in: menu
         else:
-            print("====================Main Menu====================\n")
             choice = '-1'
             while choice not in ['1', '2', '3']:
+                print("\n\n====================Main Menu====================\n")
                 choice = input("1) Login\n2) Create Account\n3) Exit Program \nEnter your choice: ")
             if choice == '1':
                 print("\n====================Login====================\n")
@@ -384,121 +409,6 @@ def menuing():
 
 
 
-# Tests for the shopping cart class (to be deleted)
-def test():
-    db = create_connection(DB_NAME)
-    user1 = User(db)
-    user1.create_account()
-    user1.logout
-    user1.username = 'tmh'
-    user1.login('12')
-    remake_db(db)
-
-
-
-    print('\n\n')
-    book = Book()
-    book.ISBN = 12345
-    book.title = 'The Lion, The Which, And The Wardrobe'
-    book.author = 'C.S. Lewis'
-    book.genre =  'fiction'
-    book.quantity = 14
-    book.price = 14.23
-    book.format = 'e-Book'
-    #print(book.__repr__())
-    cur = db.cursor()
-    sql = 'INSERT INTO Books(ISBN, title, author, genre, format, price, quantity) VALUES(?,?,?,?,?,?,?)'
-    vals = (book.ISBN, book.title, book.author, book.genre, book.format, book.price, book.quantity)
-    cur.execute(sql, vals)
-    db.commit()
-
-
-    user = User(db)
-    user.username = 'tannermhess'
-    user.payment_info['cc'] = 1234123412341234
-    user.payment_info['cc_cvv'] = 111
-    work = user.cart.add(book, 10)
-    print(str(work))
-    sql = 'SELECT * FROM Cart WHERE username=?'
-    values = (user.username,)
-    cur.execute(sql, values)
-    rows = cur.fetchall()
-    for row in rows:
-        print(row)
-    user.view_cart()
-
-    worked = user.cart.add(book, 4)
-    sql = 'SELECT * FROM Cart WHERE username=?'
-    print(str(worked))
-    values = (user.username,)
-    cur.execute(sql, values)
-    rows = cur.fetchall()
-    for row in rows:
-        print(row)
-    user.view_cart()
-
-    worked = user.cart.remove(0, 2)
-    sql = 'SELECT * FROM Cart WHERE username=?'
-    print(str(worked))
-    values = (user.username,)
-    cur.execute(sql, values)
-    rows = cur.fetchall()
-    for row in rows:
-        print(row)
-    user.view_cart()
-
-    worked = user.cart.remove(0, 15)
-    sql = 'SELECT * FROM Cart WHERE username=?'
-    print(str(worked))
-    values = (user.username,)
-    cur.execute(sql, values)
-    rows = cur.fetchall()
-    for row in rows:
-        print(row)
-    user.view_cart()
-
-
-    worked = user.cart.add(book, 4)
-    print(str(worked))
-    worked = user.cart.empty()
-    sql = 'SELECT * FROM Cart WHERE username=?'
-    print(str(worked))
-    values = (user.username,)
-    cur.execute(sql, values)
-    rows = cur.fetchall()
-    for row in rows:
-        print(row)
-    user.cart.display_cart()
-
-    user.cart.add(book, 8)
-    user.cart.remove(0,5)
-    user.cart.display_cart()
-    user.cart.checkout()
-    user.cart.display_cart()
-    sql = 'SELECT * FROM Orders WHERE username=?'
-    values = (user.username,)
-    cur.execute(sql, values)
-    rows = cur.fetchall()
-    for row in rows:
-        print(row)
-
-
-
-
-def book_test():
-    db = create_connection(DB_NAME)
-    reset_to_default(db)
-    cur = db.cursor()
-    inv = Inventory(db)
-    print('\n')
-    inv.displayAll()
-    inv.displayByAuthor('George Orwell')
-    inv.displayFormats()
-    inv.displayGenres()
-    #print(cur.fetchall())
 
 if __name__=="__main__":
-    #main()
-    #test()
-    menuing()
-    #book_test()
+    main()

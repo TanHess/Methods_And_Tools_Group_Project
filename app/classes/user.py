@@ -125,8 +125,8 @@ class User():
         cur.execute(sql, (self.username,))
         account = cur.fetchone()
         if account == None:
-            print("\nEither the username or password is incorrect!\n")
-            return
+            print("\n\n===============VALIDATION ERROR==============\nEither the username or password is incorrect!\n---------------------------------------------")
+            return False
 
         username = account[0]
         salt = account[1]
@@ -153,7 +153,7 @@ class User():
             print("Successfully logged in!")
             return True
         else:
-            print("Either the username or password is incorrect!")
+            print("\n\n===============VALIDATION ERROR==============\nEither the username or password is incorrect!\n---------------------------------------------")
             return False
 
     def logout(self):

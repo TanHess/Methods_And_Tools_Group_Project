@@ -113,21 +113,6 @@ def init_database(conn, tables):
 
 
 
-
-# SQL simplification find for a generic table name and value:
-# Returns a list of the rows held as tuples containing the individual elemnts of the rows.
-def find_many(conn, table_name: str, value_name, value) -> List[Tuple]:
-    find_str = 'SELECT * FROM ' + str(table_name) + ' WHERE ' + str(value_name) + '=' + str(value)
-    try:
-        cur = conn.cursor()
-        cur.execute(find_str)
-        rows = cur.fetchall()
-        return rows
-    except:
-        print("Unkown error occured.")
-        return False
-
-
 # Function to clear every entry in every table of the database. 
 # Really just so we can reset/repopulate db for testing/demonstrating app functionality.
 def clear_all_db(conn):
