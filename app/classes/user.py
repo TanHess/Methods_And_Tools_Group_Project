@@ -204,7 +204,7 @@ class User():
             print('-----------------------------------------')
             print('| Date ordered: ' + str(items_of_order[0][0]))
             print('| Total items ordered: ' + str(total_quantity))
-            print('| Total cost: $' + str(item[2]))
+            print('| Total cost: $' + "{:.2f}".format(item[2]))
             print("========================================")
         return return_list
 
@@ -224,7 +224,7 @@ class User():
         print('-----------------------------------------')
         print('| Date Ordered: ' + str(items_of_order[0][1]))
         print('| Total items ordered: ' + str(total_quantity))
-        print('| Total cost: $' + str(item[3]))
+        print('| Total cost: $' + "{:.2f}".format(item[3]))
         print("=========================================")
 
     
