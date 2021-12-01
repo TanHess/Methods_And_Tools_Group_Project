@@ -104,6 +104,7 @@ class User():
         cur.execute(sql, values)
         self.db.commit()
         self.logged_in = True
+        self.cart = ShoppingCart(self, self.db)
 
     # Deletes all user account, shopping cart, and order data.
     def delete_account(self):
@@ -150,7 +151,7 @@ class User():
             self.pwd_info = {"salt": salt, "key": key}
             self.initialize_cart()
 
-            print("Successfully logged in!")
+            print("\n=======================\nSuccessfully logged in!\n=======================")
             return True
         else:
             print("\n\n===============VALIDATION ERROR==============\nEither the username or password is incorrect!\n---------------------------------------------")
@@ -164,7 +165,7 @@ class User():
         self.city = ''
         self.state = ''
         self.zip = 0
-        self.cart = ShoppingCart(self)
+        self.cart = None
         self.logged_in = False
         self.payment_info = {"cc": 0, "cc_cvv": 0}
         self.pwd_info = {"salt": 0, "key": 0}
