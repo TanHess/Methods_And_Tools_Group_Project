@@ -1,5 +1,5 @@
 from classes.inventory import Inventory
-from database_manager import create_connection, TABLES, init_database, DB_NAME, clear_all_db, remake_db, reset_to_default
+from database_manager import create_connection, DB_NAME, remake_db, reset_to_default
 from classes.book import Book
 from classes.user import User
 import sys
@@ -31,7 +31,7 @@ def main():
         else:
             print("\n=============================\nError: System command invalid\n=============================\n")
             exit(1)
-            
+
     menuing(db)         # If the command entered was valid, or if no command was made, run the app through menuing.
 
 
@@ -47,13 +47,13 @@ def menuing(db):
         while True:
             isbn = input("Enter the ISBN: ")
             qty = input("Enter the quantity: ")
-            try:
-                isbn = int(isbn)
-                qty = int(qty)
-                book = inv.retrieveBook(isbn)
-                return current_user.add_to_cart(book, qty)
-            except:
-                print("\nError, only valid choices please!")
+            #try:
+            isbn = int(isbn)
+            qty = int(qty)
+            book = inv.retrieveBook(isbn)
+            return current_user.add_to_cart(book, qty)
+            #except:
+                #print("\nError, only valid choices please!")
 
 
     while run == True:

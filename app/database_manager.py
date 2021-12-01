@@ -1,6 +1,7 @@
 import sqlite3 as db
 from typing import Callable, List, Tuple 
 from classes.book import Book
+from classes.user import User
 #===================================================================================================
 # GLOBALS:
 DB_NAME = "store.db"
@@ -158,7 +159,23 @@ def reset_to_default(conn):
         Book(conn,100,6751,'Dracula',11.99,'Bram Stoker','Gothic Fiction', 'eBook'),\
         Book(conn,100,8847,'Adventures of Huckleberry Finn',10.99,'Mark Twain','Historical Fiction','Paperback')]
     populate_inventory(books)     # Populate db with books in the above list. 
-
+    # User to add to the database
+    user = User(conn)
+    user.username = 'Jack@gmail.com'
+    user.first_name = "Jack"
+    user.last_name = "Sparrow"
+    user.city = "Shipwreck City"
+    user.zip = 44561
+    user.address = "123 I'm A Pirate Lane"
+    user.payment_info["cc"] = 4421664900189201
+    user.payment_info["cc_cvv"] = 781
+    user.state = "Caribbean"
+    user.hash_password("TopSecret123")
+    sql = ''' INSERT INTO Users(first_name, last_name, username, password_salt, password_key, address, city, state, zip, cc_number, cc_cvv)
+            VALUES(?,?,?,?,?,?,?,?,?,?,?) '''
+    values = (user.first_name, user.last_name, user.username, user.pwd_info.get("salt"), user.pwd_info.get("key"), user.address, user.city, user.state, user.zip, user.payment_info.get("cc"), user.payment_info.get("cc_cvv"))
+    conn.execute(sql,values)
+    conn.commit()
 
 def remake_db(conn):
     drop_all(conn, DELETE_TABLES)
