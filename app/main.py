@@ -1,3 +1,4 @@
+from hashlib import new
 from classes.inventory import Inventory
 from database_manager import create_connection, DB_NAME, remake_db, reset_to_default
 from classes.book import Book
@@ -47,13 +48,13 @@ def menuing(db):
         while True:
             isbn = input("Enter the ISBN: ")
             qty = input("Enter the quantity: ")
-            #try:
-            isbn = int(isbn)
-            qty = int(qty)
-            book = inv.retrieveBook(isbn)
-            return current_user.add_to_cart(book, qty)
-            #except:
-                #print("\nError, only valid choices please!")
+            try:
+                isbn = int(isbn)
+                qty = int(qty)
+                book = inv.retrieveBook(isbn)
+                return current_user.add_to_cart(book, qty)
+            except:
+                print("\nError, only valid choices please!")
 
 
     while run == True:
@@ -235,8 +236,7 @@ def menuing(db):
                             new_username = input('\nEnter your new username: ')
                             conf = input("\nApply changes?\n1) Yes\n2) No\nSelection: ")
                             if conf == '1':
-                                current_user.username = new_username
-                                current_user.update_account()
+                                current_user.update_username(new_username)
                                 print("\nSuccessfully changed your username.\n")
                             else:
                                 print("\nChanges reverted.\n")
