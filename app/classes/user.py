@@ -176,6 +176,13 @@ class User():
         values = (self.first_name, self.last_name, self.username, self.address, self.city, self.state, self.zip, self.payment_info.get("cc"), self.payment_info.get("cc_cvv"), self.username)
         cur.execute(sql, values)
         self.db.commit()
+    
+    def update_username(self, new_username):
+        sql = """UPDATE Users SET username=? WHERE username=?"""
+        values = (new_username, self.username)
+        self.db.execute(sql, values)
+        self.db.commit()
+        self.username = new_username
 
     def update_password(self, password):
         self.hash_password(password)
